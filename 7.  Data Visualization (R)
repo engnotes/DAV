@@ -1,0 +1,51 @@
+data("airquality")
+
+df <- na.omit(airquality)
+
+print(dim(df))
+print(head(df))
+
+# BAR PLOT
+month_counts <- table(df$Month)
+
+barplot(month_counts,
+        col = "skyblue",
+        main = "Count of Observations per Month",
+        xlab = "Month",
+        ylab = "Count")
+
+# HISTOGRAM
+hist(df$Ozone,
+     col = "lightgreen",
+     main = "Histogram of Ozone",
+     xlab = "Ozone Levels",
+     border = "black")
+
+# BOX PLOT
+boxplot(df$Ozone,
+        col = "orange",
+        main = "Boxplot of Ozone")
+
+# BOX PLOT
+boxplot(Ozone ~ Month,
+        data = df,
+        col = rainbow(5),
+        main = "Ozone Levels by Month",
+        xlab = "Month",
+        ylab = "Ozone")
+
+# SCATTER PLOT
+plot(df$Wind, df$Ozone,
+     col = "blue",
+     pch = 19,
+     main = "Wind vs Ozone",
+     xlab = "Wind",
+     ylab = "Ozone")
+
+# HEATMAP
+numeric_data <- df[, c("Ozone", "Solar.R", "Wind", "Temp")]
+corr_matrix <- cor(numeric_data)
+
+heatmap(corr_matrix,
+        col = heat.colors(256),
+        main = "Heatmap of Correlation Matrix")
