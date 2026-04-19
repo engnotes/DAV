@@ -1,0 +1,48 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dates = pd.date_range(start='2023-01-01', periods=365, freq='D')
+values = np.random.randn(365).cumsum() + 100 
+
+df = pd.DataFrame({'Date': dates, 'Value': values})
+
+df['Date'] = pd.to_datetime(df['Date'])
+
+df.set_index('Date', inplace=True)
+
+print("--- First 5 rows of Indexed Data ---")
+print(df.head())
+print("\n")
+
+monthly_resampled = df['Value'].resample('ME').mean()
+
+print("--- Monthly Resampled Data (Mean) ---")
+print(monthly_resampled.head())
+print("\n")
+
+df['30-Day Rolling Avg'] = df['Value'].rolling(window=30).mean()
+
+plt.figure(figsize=(12, 6))
+
+plt.plot(df.index, df['Value'], label='Original Daily Data', color='lightblue')
+plt.plot(df.index, df['30-Day Rolling Avg'], label='30-Day Rolling Average', color='red', linewidth=2)
+
+plt.title('Time Series Analysis: Original Data vs Rolling Average')
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(10, 5))
+monthly_resampled.plot(kind='bar', color='orange', alpha=0.7)
+
+plt.gca().set_xticklabels([x.strftime('%Y-%m') for x in monthly_resampled.index])
+
+plt.title('Resampled Data: Average Value per Month')
+plt.xlabel('Month')
+plt.ylabel('Average Value')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
