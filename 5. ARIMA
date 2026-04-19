@@ -1,0 +1,47 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.arima.model import ARIMA
+
+np.random.seed(42)
+dates = pd.date_range(start='2020-01-01', periods=100, freq='ME')
+data = np.linspace(10, 50, 100) + np.random.normal(0, 2, 100)
+df = pd.DataFrame({'Value': data}, index=dates)
+
+plt.figure(figsize=(10, 4))
+plt.plot(df.index, df['Value'])
+plt.title('Time Series Data')
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.grid(True)
+plt.show()
+
+result = adfuller(df['Value'])
+print('ADF Statistic:', result[0])
+print('p-value:', result[1])
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 4))
+plot_acf(df['Value'], ax=axes[0])
+plot_pacf(df['Value'], ax=axes[1])
+plt.show()
+
+model = ARIMA(df['Value'], order=(1, 1, 1))
+model_fit = model.fit()
+print(model_fit.summary())
+
+forecast_steps = 20
+forecast = model_fit.get_forecast(steps=forecast_steps)
+forecast_index = pd.date_range(start=df.index[-1] + pd.Timedelta(days=1), periods=forecast_steps, freq='ME')
+forecast_series = pd.Series(forecast.predicted_mean.values, index=forecast_index)
+
+plt.figure(figsize=(10, 4))
+plt.plot(df.index, df['Value'], label='Original Data')
+plt.plot(forecast_series.index, forecast_series, label='ARIMA Forecast', color='red')
+plt.title('ARIMA Model Forecast')
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.legend()
+plt.grid(True)
+plt.show()
