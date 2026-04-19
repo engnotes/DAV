@@ -1,0 +1,55 @@
+# Simple Linear Regression on California Housing Dataset
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Step 1: Load the California Housing dataset
+try:
+    housing = fetch_california_housing(as_frame=True)
+except Exception as e:
+    print(f"Error loading dataset: {e}")
+    exit(1)
+
+# Convert to DataFrame
+df = housing.frame
+
+# Step 2: Select one feature (Median Income) and target (Median House Value)
+X = df[['MedInc']]  # Feature
+y = df['MedHouseVal']  # Target
+
+# Step 3: Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+
+# Step 4: Create and train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 5: Make predictions
+y_pred = model.predict(X_test)
+
+# Step 6: Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Simple Linear Regression on California Housing Dataset")
+print(f"Coefficient (Slope): {model.coef_[0]:.4f}")
+print(f"Intercept: {model.intercept_:.4f}")
+print(f"Mean Squared Error: {mse:.4f}")
+print(f"R² Score: {r2:.4f}")
+
+# Step 7: Visualization
+plt.figure(figsize=(8, 6))
+plt.scatter(X_test, y_test, color='blue', alpha=0.5, label='Actual Data')
+plt.plot(X_test, y_pred, color='red', linewidth=2, label='Regression Line')
+plt.xlabel('Median Income (in $10,000s)')
+plt.ylabel('Median House Value (in $100,000s)')
+plt.title('Simple Linear Regression: Median Income vs House Value')
+plt.legend()
+plt.grid(True)
+plt.show()
