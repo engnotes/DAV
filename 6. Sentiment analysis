@@ -1,0 +1,76 @@
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk import pos_tag
+from textblob import TextBlob
+
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger')
+
+def get_wordnet_pos(tag):
+    if tag.startswith('J'):
+        return 'a'
+    elif tag.startswith('V'):
+        return 'v'
+    elif tag.startswith('N'):
+        return 'n'
+    elif tag.startswith('R'):
+        return 'r'
+    else:
+        return 'n'
+
+def clean(text):
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    return text.lower()
+
+def main():
+    print(" SENTIMENT ANALYSIS ")
+
+    text = input("Enter a sentence: ").strip()
+
+    if not text:
+        print("Error: Empty input")
+        return
+
+    clean_text = clean(text)
+    tokens = word_tokenize(clean_text)
+    pos_tags = pos_tag(tokens)
+
+    stop_words = set(stopwords.words('english'))
+    filtered_tokens = [word for word in tokens if word not in stop_words]
+
+    lemmatizer = WordNetLemmatizer()
+    lemmatized_words = [
+        lemmatizer.lemmatize(word, get_wordnet_pos(tag))
+        for word, tag in pos_tag(filtered_tokens)
+    ]
+
+    processed_text = " ".join(lemmatized_words)
+
+    blob = TextBlob(processed_text)
+    polarity = blob.sentiment.polarity
+
+    if polarity > 0:
+        sentiment = "Positive"
+    elif polarity < 0:
+        sentiment = "Negative"
+    else:
+        sentiment = "Neutral"
+
+    print("\n OUTPUT ")
+    print("Original Text           :", text)
+    print("Cleaned Text            :", clean_text)
+    print("Tokens                  :", tokens)
+    print("POS Tags                :", pos_tags)
+    print("After Stopword Removal  :", filtered_tokens)
+    print("Lemmatized Words        :", lemmatized_words)
+    print("Final Processed Text    :", processed_text)
+    print("Polarity Score          :", polarity)
+    print("Sentiment               :", sentiment)
+
+if __name__ == "__main__":
+    main()
